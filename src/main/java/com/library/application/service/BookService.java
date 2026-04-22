@@ -77,6 +77,44 @@ public class BookService implements BookUseCase {
         return repositoryPort.findById(id);
     }
 
+    // ── Caso de Uso 3: Atualizar Livro ───────────────────────────────
+
+    @Override
+    public Book updateBook(UUID id, String title, String author, String isbn, int publicationYear) {
+        log.debug("Atualizando livro: id={}, title={}", id, title);
+
+        var book = repositoryPort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Livro não encontrado para o ID: " + id));
+
+        book.update(title, author, isbn, publicationYear);
+
+        if (!book.hasValidIsbn()) {
+            throw new IllegalArgumentException(
+                    "ISBN inválido: deve ter exatamente 13 dígitos. Fornecido: " + isbn
+            );
+        }
+
+        var savedBook = repositoryPort.save(book);
+        log.info("Livro atualizado: id={}", savedBook.getId());
+
+        // Poderia publicar um evento BookUpdatedEvent aqui se necessário
+        
+        return savedBook;
+    }
+
+    // ── Caso de Uso 4: Remover Livro ─────────────────────────────────
+
+    @Override
+    public void deleteBook(UUID id) {
+        log.debug("Removendo livro: id={}", id);
+        // Verifica se existe (opcional, dependendo de como você quer lidar com NotFound)
+        repositoryPort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Livro não encontrado para o ID: " + id));
+        
+        repositoryPort.deleteById(id);
+        log.info("Livro removido: id={}", id);
+    }
+
     // ── Método auxiliar com Stream API ────────────────────────────
 
     /**

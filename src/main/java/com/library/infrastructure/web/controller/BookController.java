@@ -7,6 +7,7 @@ import com.library.infrastructure.web.dto.BookDTOs.CreateBookRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.library.infrastructure.web.dto.BookDTOs.UpdateBookRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -83,6 +84,50 @@ public class BookController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
         // Stream/Optional API: elegante, sem if-else
+    }
+
+    /**
+     * PUT /books/{id}
+     * Atualiza os dados de um livro existente.
+     * Retorna 200 OK com os dados atualizados ou 404/400 em caso de erro.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<BookResponse> updateBook(
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateBookRequest request) {
+        
+        try {
+            Book updated = bookUseCase.updateBook(
+                    id,
+                    request.title(),
+                    request.author(),
+                    request.isbn(),
+                    request.publicationYear()
+            );
+            return ResponseEntity.ok(toResponse(updated));
+        } catch (IllegalArgumentException e) {
+            // Em uma app real, um ControllerAdvice global (ExceptionHandler) faria isso.
+            // Para simplicidade, usamos 404 (se for não encontrado) ou 400 (se for erro de negócio).
+            if (e.getMessage().contains("não encontrado")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * DELETE /books/{id}
+     * Remove um livro pelo ID.
+     * Retorna 204 No Content em caso de sucesso.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable UUID id) {
+        try {
+            bookUseCase.deleteBook(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // ── Mapeamento DTO ────────────────────────────────────────────

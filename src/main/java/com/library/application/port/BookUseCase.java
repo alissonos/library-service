@@ -28,4 +28,14 @@ public interface BookUseCase {
      * Caso de uso: Buscar um livro por ID.
      */
     Optional<Book> findBookById(UUID id);
+
+    /**
+     * Caso de uso: Atualizar um livro existente.
+     */
+    Book updateBook(UUID id, String title, String author, String isbn, int publicationYear);
+
+    /**
+     * Caso de uso: Remover um livro.
+     */
+    void deleteBook(UUID id);
 }

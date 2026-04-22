@@ -31,4 +31,9 @@ public interface BookRepositoryPort {
      * Optional é Java moderno — evita null e força tratamento explícito.
      */
     Optional<Book> findById(UUID id);
+
+    /**
+     * Remove um livro pelo seu identificador único.
+     */
+    void deleteById(UUID id);
 }

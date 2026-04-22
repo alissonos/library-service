@@ -1,27 +1,28 @@
 package com.library.infrastructure.persistence.adapter;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.stereotype.Component;
+
 import com.library.domain.model.Book;
 import com.library.domain.port.BookRepositoryPort;
 import com.library.infrastructure.persistence.entity.BookJpaEntity;
 import com.library.infrastructure.persistence.repository.SpringBookRepository;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * ╔══════════════════════════════════════════════════════════════╗
- * ║  CAMADA: Infrastructure — Adapter de Persistência            ║
+ * ║ CAMADA: Infrastructure — Adapter de Persistência ║
  * ╠══════════════════════════════════════════════════════════════╣
- * ║  CONCEITOS APLICADOS:                                        ║
- * ║  • Arquitetura Hexagonal: "Driven Adapter" — implementa o    ║
- * ║    Output Port definido pelo domínio usando JPA              ║
- * ║  • SOLID / DIP: o domínio enxerga BookRepositoryPort;        ║
- * ║    esta classe é o "como" que o domínio não precisa saber    ║
- * ║  • SOLID / SRP: única responsabilidade — traduzir entre      ║
- * ║    Book (domínio) e BookJpaEntity (JPA)                      ║
- * ║                                                              ║
- * ║  Padrão: Anti-corruption Layer entre domínio e JPA.         ║
+ * ║ CONCEITOS APLICADOS: ║
+ * ║ • Arquitetura Hexagonal: "Driven Adapter" — implementa o ║
+ * ║ Output Port definido pelo domínio usando JPA ║
+ * ║ • SOLID / DIP: o domínio enxerga BookRepositoryPort; ║
+ * ║ esta classe é o "como" que o domínio não precisa saber ║
+ * ║ • SOLID / SRP: única responsabilidade — traduzir entre ║
+ * ║ Book (domínio) e BookJpaEntity (JPA) ║
+ * ║ ║
+ * ║ Padrão: Anti-corruption Layer entre domínio e JPA. ║
  * ╚══════════════════════════════════════════════════════════════╝
  */
 @Component
@@ -48,8 +49,13 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
     @Override
     public Optional<Book> findById(UUID id) {
         return springBookRepository
-                .findById(id.toString())   // UUID → String (chave da tabela)
-                .map(this::toDomain);      // Stream API + method reference
+                .findById(id.toString()) // UUID → String (chave da tabela)
+                .map(this::toDomain); // Stream API + method reference
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        springBookRepository.deleteById(id.toString());
     }
 
     // ── Mapeamento manual (substitui MapStruct para simplicidade) ──
@@ -64,8 +70,7 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
                 book.getTitle(),
                 book.getAuthor(),
                 book.getIsbn(),
-                book.getPublicationYear()
-        );
+                book.getPublicationYear());
     }
 
     /**
@@ -77,7 +82,6 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
                 entity.getTitle(),
                 entity.getAuthor(),
                 entity.getIsbn(),
-                entity.getPublicationYear()
-        );
+                entity.getPublicationYear());
     }
 }

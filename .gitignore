@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+\n# Local Data\ndata/\nmodels.json\n

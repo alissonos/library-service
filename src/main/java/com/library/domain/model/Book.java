@@ -61,6 +61,13 @@ public class Book {
         return isbn != null && isbn.matches("\\d{13}");
     }
 
+    public void update(String title, String author, String isbn, int publicationYear) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.publicationYear = publicationYear;
+    }
+
     // ── Getters (sem setters para manter imutabilidade parcial) ───
 
     public UUID getId()              { return id; }

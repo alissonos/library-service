@@ -43,6 +43,27 @@ public class BookDTOs {
     ) {}
 
     /**
+     * DTO de entrada — corpo do PUT /books/{id}.
+     * Semelhante ao de criação, mas semanticamente diferente.
+     */
+    public record UpdateBookRequest(
+
+            @NotBlank(message = "Título é obrigatório")
+            String title,
+
+            @NotBlank(message = "Autor é obrigatório")
+            String author,
+
+            @NotBlank(message = "ISBN é obrigatório")
+            @Size(min = 13, max = 13, message = "ISBN deve ter exatamente 13 caracteres")
+            String isbn,
+
+            @Positive(message = "Ano de publicação deve ser positivo")
+            int publicationYear
+
+    ) {}
+
+    /**
      * DTO de saída — retornado nas respostas GET e POST.
      *
      * Inclui 'isClassic' — calculado no domínio, exposto na API.
