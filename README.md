@@ -27,6 +27,8 @@ Abaixo detalhamos os endpoints REST expostos pela aplicação (recursos de `/boo
 | ------ | ---- | --------- |
 | **POST** | `/books` | Cadastra um novo livro na base. Retorna `201 Created` e um header `Location` com a URI de consulta. |
 | **GET**  | `/books/{id}` | Busca os detalhes de um livro recém-criado através de seu UUID. Retorna `200 OK` se encontrado ou `404 Not Found`. |
+| **DELETE**  | `/books/{id}` | Remove um livro do sistema através de seu UUID. `Retorna 204` No Content em caso de sucesso ou `404 Not Found` |
+| **UPDATE**  | `/books/{id}` | Busca os detalhes de um livro recém-criado através de seu UUID. Retorna `200 OK` se encontrado ou `404 Not Found`. |
 
 ## ▶️ Como Executar
 
