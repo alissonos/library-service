@@ -44,6 +44,10 @@ public class BookService implements BookUseCase {
     }
 
     // ── Caso de Uso 1: Criar Livro ────────────────────────────────
+    // MODELO ASSÍNCRONO ORIENTADO A EVENTOS:
+    // 1. UseCase publica o evento (NÃO persiste!)
+    // 2. Consumer recebe o evento e persiste no banco
+    // Benefício: elimina "dual write problem" e garante consistência eventual
 
     @Override
     public Book createBook(String title, String author, String isbn, int publicationYear) {
@@ -59,14 +63,14 @@ public class BookService implements BookUseCase {
             );
         }
 
-        // 3. Persiste via porta de saída (sem saber que é JPA + H2)
-        var savedBook = repositoryPort.save(book);
-        log.info("Livro salvo: id={}", savedBook.getId());
+        // 3. APENAS PUBLICA O EVENTO — não persiste aqui!
+        // O Consumer (assíncrono) é quem salva no banco
+        eventPublisherPort.publishBookCreated(book);
+        log.info("Evento de criação publicado para livro: id={}", book.getId());
 
-        // 4. Publica evento via porta de saída (sem saber que é RabbitMQ)
-        eventPublisherPort.publishBookCreated(savedBook);
-
-        return savedBook;
+        // 4. Retorna o livro com ID, mas SEM ter persistido ainda
+        // HTTP 202 será retornado ao cliente (Accepted, não Created)
+        return book;
     }
 
     // ── Caso de Uso 2: Buscar Livro por ID ───────────────────────

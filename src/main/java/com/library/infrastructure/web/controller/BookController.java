@@ -40,18 +40,28 @@ public class BookController {
 
     /**
      * POST /books
-     * Cadastra um novo livro.
+     * Cadastra um novo livro — MODELO ASSÍNCRONO.
      *
-     * Boas práticas REST:
-     * — Retorna 201 Created (não 200 OK)
-     * — Header Location aponta para o recurso criado
-     * — Corpo: representação do recurso criado
+     * Fluxo:
+     * 1. Valida o request
+     * 2. Chama use case que publica o evento (NÃO persiste!)
+     * 3. Retorna 202 Accepted (não 201 Created)
+     * 4. Consumer (async) processa o evento e salva no banco
+     *
+     * Boas práticas REST para assincronismo:
+     * — 202 Accepted: servidor aceita o request, mas processará depois
+     * — Header Location aponta para onde pedir status (ou para o recurso eventual)
+     * — Corpo: representação em estado "pending" ou "accepted"
+     *
+     * Nota: em produção, implementar endpoint GET /books/{id}/status
+     * para cliente monitorar o estado do processamento assíncrono
      */
     @PostMapping
     public ResponseEntity<BookResponse> createBook(
             @RequestBody @Valid CreateBookRequest request) {
 
-        // 1. Chama o caso de uso (não contém lógica de negócio aqui)
+        // 1. Chama o caso de uso que APENAS PUBLICA o evento
+        // O livro ainda não está no banco, apenas no event queue
         Book created = bookUseCase.createBook(
                 request.title(),
                 request.author(),
@@ -60,14 +70,19 @@ public class BookController {
         );
 
         // 2. Constrói o header Location: /books/{id}
+        // Em produção, poderia ser /books/{id}/status para monitorar progresso
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
 
-        // 3. Mapeia domínio → DTO de resposta e retorna 201
-        return ResponseEntity.created(location).body(toResponse(created));
+        // 3. Retorna 202 Accepted (não 201 Created!)
+        // A resposta inclui o livro que será persistido
+        // Cliente deve fazer GET /books/{id} depois para validar
+        return ResponseEntity.accepted()
+                .location(location)
+                .body(toResponse(created));
     }
 
     /**

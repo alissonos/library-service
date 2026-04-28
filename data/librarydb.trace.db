@@ -1,0 +1,6 @@
+2026-04-27 17:09:24.700467-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]BOOKS BOOKS"; expected "BACKUP, BEGIN"; SQL statement:
+BOOKS BOOKS [42001-224]
+2026-04-27 17:09:25.287643-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]BOOKS BOOKS"; expected "BACKUP, BEGIN"; SQL statement:
+BOOKS BOOKS [42001-224]
